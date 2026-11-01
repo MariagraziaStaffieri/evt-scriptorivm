@@ -1,3 +1,4 @@
+// Modified by Mariagrazia Staffieri, 2026-11-01: support for TEI lb/@break (att.breaking).
 import { Component, Input } from '@angular/core';
 import { map } from 'rxjs/operators';
 
@@ -39,6 +40,15 @@ export class LbComponent {
         }
       }),
     );
+  }
+
+  /**
+   * TEI att.breaking: with break="no" the line beginning falls inside a word,
+   * so no word separator is added when lines are rendered inline.
+   * See TEI P5 Guidelines, 3.11.3 "Milestone Elements" and the definition of att.breaking.
+   */
+  get continuesWord(): boolean {
+    return (this.data?.break ?? this.data?.attributes?.break) === 'no';
   }
 
   get displayInline$() {

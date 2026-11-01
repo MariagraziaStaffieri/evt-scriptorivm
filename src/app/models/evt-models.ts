@@ -1,3 +1,4 @@
+// Modified by Mariagrazia Staffieri, 2026-11-01: support for TEI lb/@break (att.breaking).
 import { Type } from '@angular/core';
 import { EditionLevelType, EditorialConventionAttributes } from '../app.config';
 import { ParseResult } from '../services/xml-parsers/parser-models';
@@ -472,6 +473,8 @@ export class Lb extends GenericElement {
     n?: string;
     facs?: string; // Needed to handle ITL
     rend?: string;
+    // TEI att.breaking (@break): 'no' means the line beginning does not end the orthographic token (the word continues)
+    break?: 'yes' | 'no' | 'maybe' | string;
 }
 
 export type Comment = GenericElement;

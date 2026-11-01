@@ -1,3 +1,4 @@
+<!-- Modified by Mariagrazia Staffieri, 2026-11-01: no word separator when lb/@break="no" (TEI att.breaking). -->
 <span class="lb" 
     [evtHtmlAttributes]="data?.attributes"
     [attr.id]="data.id" [attr.data-rend]="data.rend || ''" [attr.data-facs]="data.facs || ''">
@@ -5,5 +6,5 @@
         <br *ngIf="displayBlock$ | async"/>
         <span class="lineN" *ngIf="(data.n && (displayBlock$ | async))">{{data.n}}</span>
     </ng-container>
-    <ng-container *ngIf="displayInline$ | async">&nbsp;</ng-container>
+    <ng-container *ngIf="(displayInline$ | async) && !continuesWord">&nbsp;</ng-container>
 </span>

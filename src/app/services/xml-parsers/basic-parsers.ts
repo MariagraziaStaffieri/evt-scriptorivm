@@ -1,3 +1,4 @@
+// Modified by Mariagrazia Staffieri, 2026-11-01: support for TEI lb/@break (att.breaking).
 import { AttributesMap } from 'ng-dynamic-component';
 import { ParserRegister, xmlParser } from '.';
 import {
@@ -160,6 +161,7 @@ export class LBParser extends EmptyParser implements Parser<XMLElement> {
             n: getNOrDefault(n),
             rend,
             facs,
+            break: attributes.break,
             type: Lb,
             content: [],
             attributes,
