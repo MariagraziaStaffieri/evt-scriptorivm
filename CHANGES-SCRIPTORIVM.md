@@ -58,3 +58,40 @@ Riferimento / reference: TEI P5 Guidelines, version 4.12.0.
   `@break="no"` are unaffected; the block rendering (one line per line, with its
   number) is unchanged.
 - *Files.* As listed above.
+
+---
+
+## 2. Avviso sull'apparato critico solo per le edizioni critiche / Critical-apparatus notice only for critical editions
+
+**Italiano.**
+
+- *Che cosa fa EVT oggi.* `EVTModelService` chiama sempre
+  `StructureXmlParserService.processCriticalApparatus`; se il sorgente non contiene
+  elementi `<app>`, registra l'avviso «There are no apps in the source», che
+  compare nel pulsante «Errors» della barra, anche quando il livello di edizione critico è spento in
+  `config.yaml` (`edition.availableEditionLevels`, `critical` con `enable: false`).
+- *Linee guida TEI.* L'apparato critico è un modulo facoltativo (capitolo 13
+  *Critical Apparatus*, <https://www.tei-c.org/release/doc/tei-p5-doc/en/html/TC.html>);
+  un'edizione diplomatica o interpretativa senza `<app>` è codificata in modo del
+  tutto regolare (capitolo 12 *Representation of Primary Sources*,
+  <https://www.tei-c.org/release/doc/tei-p5-doc/en/html/PH.html>).
+- *Miglioria.* L'avviso si registra solo quando il livello critico è attivo nella
+  configurazione (o quando la configurazione non elenca livelli, come prima). Il
+  resto dell'elaborazione dell'apparato non cambia.
+- *File.* `src/app/services/xml-parsers/structure-xml-parser.service.ts`; prova in
+  `structure-xml-parser.service.spec.ts` (nuovo).
+
+**English.**
+
+- *What EVT does today.* `EVTModelService` always calls
+  `StructureXmlParserService.processCriticalApparatus`; when the source has no
+  `<app>` elements it logs "There are no apps in the source", shown by the
+  "Errors" button in the header, even when the critical edition level is disabled in `config.yaml`
+  (`edition.availableEditionLevels`, `critical` with `enable: false`).
+- *TEI Guidelines.* The critical apparatus is an optional module (chapter 13
+  *Critical Apparatus*); a diplomatic or interpretative edition without `<app>` is
+  perfectly regular encoding (chapter 12 *Representation of Primary Sources*).
+- *Enhancement.* The notice is logged only when the critical level is enabled in
+  the configuration (or when no levels are configured, as before). The rest of the
+  apparatus processing is unchanged.
+- *Files.* As listed above.

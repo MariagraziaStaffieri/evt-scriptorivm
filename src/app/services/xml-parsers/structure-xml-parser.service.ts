@@ -1,3 +1,4 @@
+// Modified by Mariagrazia Staffieri, 2026-11-01: the notice about missing <app> elements depends on the critical edition level being enabled.
 import { Injectable } from '@angular/core';
 import { AppConfig, ImagesSource } from '../../app.config';
 import { Anchor, ApparatusEntry, ApparatusEntryExponent, Attribute, Cb, DocumentApparatusEntries, EditionStructure, ElementApparatusEntries, GenericElement, LacunaPair, OriginalEncodingNodeType, Page, Text, XMLElement } from '../../models/evt-models';
@@ -11,6 +12,18 @@ import { AlphabetService } from '../alphabet.service';
 import { AppParser } from './app-parser';
 import { ErrorsService } from '../errors.service';
 import { ParserRegister } from '.';
+
+/**
+ * Whether the critical edition level is enabled in the edition configuration
+ * (edition.availableEditionLevels). When no levels are configured, the previous behaviour is kept.
+ */
+export function isCriticalEditionLevelEnabled(levels = AppConfig.evtSettings?.edition?.availableEditionLevels): boolean {
+  if (!levels || levels.length === 0) {
+    return true;
+  }
+
+  return levels.some((level) => level.id === 'critical' && level.enable);
+}
 
 @Injectable({
   providedIn: 'root',
@@ -109,7 +122,11 @@ export class StructureXmlParserService {
     if (!this.allApps.length) {
       this.allApps = Array.from(source.querySelectorAll("app"));
       if (!this.allApps.length) {
-        this.errorService.logWarning('There are no apps in the source');
+        // A source without <app> is expected when the critical edition level is not in use
+        // (e.g. diplomatic or interpretative editions): the notice is useful only for critical editions.
+        if (isCriticalEditionLevelEnabled()) {
+          this.errorService.logWarning('There are no apps in the source');
+        }
         this.errorService.loadingEnd();
         return;
       }
