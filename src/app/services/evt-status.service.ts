@@ -219,10 +219,45 @@ export class EVTStatusService {
                 }
             }
         });
+        this.listenToEmbeddingPage();
         this.currentNamedEntityId$.pipe(
             filter((id) => !!id),
             switchMap((id) => timer(5000).pipe(map(() => id))),
         ).subscribe(() => this.currentNamedEntityId$.next(undefined));
+    }
+
+    /**
+     * When EVT is embedded in an iframe, the embedding page (same origin only)
+     * can change the view mode and the edition level without reloading EVT:
+     *
+     *     iframe.contentWindow.postMessage(
+     *       { type: 'evt:view', viewMode: 'imageText', editionLevel: 'diplomatic' },
+     *       window.location.origin);
+     *
+     * The view mode is otherwise read only once, at the first navigation, so
+     * changing the route from outside had no effect and required a full reload.
+     * Once the listener is in place, EVT posts { type: 'evt:ready' } to the
+     * embedding page.
+     */
+    private listenToEmbeddingPage() {
+        if (typeof window === 'undefined' || window.parent === window) {
+            return;
+        }
+        window.addEventListener('message', (event: MessageEvent) => {
+            if (event.origin !== window.location.origin || event.data?.type !== 'evt:view') {
+                return;
+            }
+            const viewMode = this.availableViewModes.find((vm) => vm.id === event.data.viewMode);
+            if (viewMode && viewMode.id !== this.updateViewMode$.getValue()?.id) {
+                this.updateViewMode$.next(viewMode);
+            }
+            const editionLevel = this.availableEditionLevels.find((el) => el.id === event.data.editionLevel);
+            if (editionLevel) {
+                this.updateEditionLevels$.next([editionLevel.id]);
+            }
+        });
+        // Tell the embedding page that view changes can now be sent.
+        window.parent.postMessage({ type: 'evt:ready' }, window.location.origin);
     }
 
     getUrlFromStatus(fileConfigUrl: string, status: AppStatus) {

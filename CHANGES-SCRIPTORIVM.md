@@ -95,3 +95,36 @@ Riferimento / reference: TEI P5 Guidelines, version 4.12.0.
   the configuration (or when no levels are configured, as before). The rest of the
   apparatus processing is unchanged.
 - *Files.* As listed above.
+
+---
+
+## 3. Cambiare vista da una pagina che incorpora EVT / Changing view from an embedding page
+
+**Italiano.**
+
+- *Che cosa fa EVT oggi.* `EVTStatusService` legge il modo di visualizzazione
+  (`readingText`, `textText`, `imageText`…) una volta sola, alla prima navigazione.
+  Una pagina che mostra EVT in un iframe e offre i suoi comandi per scegliere la
+  vista deve quindi ricaricare tutto il visore a ogni cambio, e con un'edizione
+  grande il visore rilegge ogni volta tutto il TEI.
+- *Miglioria.* Una pagina della stessa origine può mandare all'iframe il messaggio
+  `{ type: 'evt:view', viewMode, editionLevel }` con `postMessage`: EVT cambia modo
+  e livello di edizione come se li avesse scelti la persona, senza ricaricarsi.
+  Messaggi da altre origini, o con modi e livelli non attivi nella configurazione,
+  si ignorano. Quando è pronto a riceverli, EVT manda alla pagina
+  `{ type: 'evt:ready' }`. Fuori da un iframe non cambia niente.
+- *File.* `src/app/services/evt-status.service.ts`.
+
+**English.**
+
+- *What EVT does today.* `EVTStatusService` reads the view mode (`readingText`,
+  `textText`, `imageText`…) only once, at the first navigation. A page that shows
+  EVT in an iframe with its own view controls has to reload the whole viewer on
+  every change, and with a large edition the viewer parses the whole TEI again.
+- *Enhancement.* A same-origin page can post `{ type: 'evt:view', viewMode,
+  editionLevel }` to the iframe: EVT switches view mode and edition level as if the
+  user had chosen them, without reloading. Messages from other origins, or naming
+  view modes or levels not enabled in the configuration, are ignored. When ready
+  to receive them, EVT posts `{ type: 'evt:ready' }` to the page. Outside an
+  iframe nothing changes.
+- *Files.* `src/app/services/evt-status.service.ts`.
