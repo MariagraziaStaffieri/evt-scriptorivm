@@ -230,10 +230,18 @@ export class TextPanelComponent implements OnDestroy {
     } else if (this.mainContent) {
       const mainContentEl: HTMLElement = this.mainContent.nativeElement;
       const pageEl = mainContentEl.querySelector<HTMLElement>(`[data-id="${pageId}"]`);
-      if (pageEl) {
-        pageEl.scrollIntoView();
-      } else {
-        mainContentEl.parentElement.scrollTop = 0;
+      const scroller = mainContentEl.parentElement;
+      if (pageEl && scroller) {
+        // Scroll only the panel itself. Element.scrollIntoView() also scrolls
+        // every scrollable ancestor, including the embedding page when the
+        // viewer runs in a same-origin iframe, so a change of view mode made
+        // the host page jump down to the viewer.
+        // The first page starts from the very top of the panel.
+        const first = mainContentEl.querySelector<HTMLElement>('[data-id]') === pageEl;
+        const top = pageEl.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
+        scroller.scrollTop = first ? 0 : Math.max(0, top);
+      } else if (scroller) {
+        scroller.scrollTop = 0;
       }
     }
   }

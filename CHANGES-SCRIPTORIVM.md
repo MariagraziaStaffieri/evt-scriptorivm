@@ -128,3 +128,28 @@ Riferimento / reference: TEI P5 Guidelines, version 4.12.0.
   to receive them, EVT posts `{ type: 'evt:ready' }` to the page. Outside an
   iframe nothing changes.
 - *Files.* `src/app/services/evt-status.service.ts`.
+
+## 4. Il testo comincia dall'alto, senza far scorrere la pagina che incorpora EVT / The text starts from the top, without scrolling the embedding page
+
+**Italiano.**
+
+- *Che cosa fa EVT oggi.* Cambiando vista, o pagina, il pannello del testo porta in
+  vista la pagina con `Element.scrollIntoView()`. Quel metodo fa scorrere anche ogni
+  contenitore che lo contiene: quando EVT è in un iframe della stessa origine, scorre
+  anche la pagina che lo incorpora, che salta in giù fino al visore a ogni cambio di
+  vista.
+- *Miglioria.* Il pannello scorre da sé (`scrollTop` del suo contenitore): la pagina
+  scelta va in cima al pannello, la prima pagina comincia dall'inizio, e la pagina che
+  incorpora EVT non si muove.
+- *File.* `src/app/panels/text-panel/text-panel.component.ts`.
+
+**English.**
+
+- *What EVT does today.* On a change of view mode or page, the text panel brings the
+  page into view with `Element.scrollIntoView()`. That method also scrolls every
+  scrollable ancestor: when EVT runs in a same-origin iframe, the embedding page
+  scrolls too, and jumps down to the viewer on every change of view.
+- *Enhancement.* The panel scrolls itself (`scrollTop` of its container): the chosen
+  page goes to the top of the panel, the first page starts from the very beginning,
+  and the embedding page does not move.
+- *Files.* `src/app/panels/text-panel/text-panel.component.ts`.
