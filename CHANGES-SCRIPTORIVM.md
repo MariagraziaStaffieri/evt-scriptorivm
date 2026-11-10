@@ -153,3 +153,37 @@ Riferimento / reference: TEI P5 Guidelines, version 4.12.0.
   page goes to the top of the panel, the first page starts from the very beginning,
   and the embedding page does not move.
 - *Files.* `src/app/panels/text-panel/text-panel.component.ts`.
+
+## 5. La configurazione si accetta solo dagli indirizzi ammessi / The configuration is accepted only from the allowed addresses
+
+**Italiano.**
+
+- *Che cosa fa EVT oggi.* Con `#fileConfigUrl=…` una pagina può dire a EVT da dove
+  leggere la configurazione. EVT controlla l'indirizzo con gli elenchi di
+  `assets/config/host_config.json` (`allowedEVTAASConfigBaseUrls`), ma con
+  `includes`: basta che l'indirizzo *contenga* uno dei prefissi. Con il prefisso
+  `/evt-anteprima/`, anche `https://altro.example/evt-anteprima/c.yaml` passa, e la
+  configurazione e il TEI di un altro sito si caricano nella pagina di EVT, sulla
+  sua origine.
+- *Miglioria.* L'indirizzo chiesto e i prefissi ammessi si risolvono rispetto alla
+  pagina (`new URL`), e l'indirizzo passa solo se ha la stessa origine di un
+  prefisso e il suo percorso, già normalizzato, comincia con quello del prefisso.
+  Solo `http:` e `https:`, senza nome e parola d'ordine nell'indirizzo. I prefissi
+  assoluti di `host_config.json` continuano a funzionare come prima.
+- *File.* `src/app/app.config.ts`.
+
+**English.**
+
+- *What EVT does today.* With `#fileConfigUrl=…` a page can tell EVT where to read
+  its configuration from. EVT checks the address against
+  `assets/config/host_config.json` (`allowedEVTAASConfigBaseUrls`), but with
+  `includes`: the address only has to *contain* one of the prefixes. With the
+  prefix `/evt-anteprima/`, `https://other.example/evt-anteprima/c.yaml` is accepted
+  too, and another site's configuration and TEI are loaded into EVT's page, on its
+  origin.
+- *Enhancement.* Both the requested address and the allowed prefixes are resolved
+  against the page (`new URL`); the address is accepted only if it has the same
+  origin as a prefix and its normalised path starts with the prefix's path. Only
+  `http:` and `https:`, with no user name or password in the address. Absolute
+  prefixes in `host_config.json` keep working as before.
+- *Files.* `src/app/app.config.ts`.

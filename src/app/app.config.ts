@@ -10,6 +10,37 @@ import { reduceCssUnit, updateCSS } from './utils/dom-utils';
 import * as yaml from 'js-yaml';
 import { isAbsoluteUrl } from './utils/js-utils';
 
+/**
+ * Whether the configuration URL requested in `#fileConfigUrl` lies under one
+ * of the allowed bases.
+ *
+ * Both URLs are resolved against the document base (as the HTTP request will
+ * be) and normalised, then compared by origin and path prefix: `/evt-anteprima/`
+ * allows only `<same origin>/evt-anteprima/...`, not
+ * `https://other.example/evt-anteprima/...` nor `/evt-anteprima/../elsewhere`.
+ * Only http(s) URLs without credentials are accepted.
+ */
+export function isAllowedConfigUrl(requested: string, allowedBases: string[], baseUrl: string): boolean {
+    let url: URL;
+    try {
+        url = new URL(requested, baseUrl);
+    } catch {
+        return false;
+    }
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return false;
+    if (url.username || url.password) return false;
+    return (allowedBases ?? []).some((base) => {
+        let b: URL;
+        try {
+            b = new URL(base, baseUrl);
+        } catch {
+            return false;
+        }
+        const prefix = b.pathname.endsWith('/') ? b.pathname : b.pathname + '/';
+        return b.origin === url.origin && url.pathname.startsWith(prefix);
+    });
+}
+
 @Injectable()
 export class AppConfig {
     static evtSettings: EVTConfig;
@@ -23,9 +54,7 @@ export class AppConfig {
             const paramsUrl = params.get("fileConfigUrl");
             if (!paramsUrl || paramsUrl === this.defaultFileConfigUrl) return this.defaultFileConfigUrl;
 
-            const prefixesMatched = allowedUrls.filter(x => paramsUrl.includes(x))
-            console.log("matched prefix: " + prefixesMatched)
-            if (!prefixesMatched.length) throw new Error(paramsUrl + " not allowed");
+            if (!isAllowedConfigUrl(paramsUrl, allowedUrls, document.baseURI)) throw new Error(paramsUrl + " not allowed");
             return paramsUrl;
         }),
         shareReplay(1)
